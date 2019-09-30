@@ -21,10 +21,12 @@ class PostController extends AbstractController {
     public function userCreate(Request $request, UserPasswordEncoderInterface $encoder, ValidatorInterface $validator, SerializerInterface $serializer, ObjectManager $manager) {
         $recievedData = json_decode($request->getContent(), true);
         $errors = [];
-        if (!array_key_exists('email', $recievedData)) $errors[] = "Vous n'avez pas renseigne de propriete 'email'.";
-        if (!array_key_exists('username', $recievedData)) $errors[] = "Vous n'avez pas renseigne de propriete 'username'.";
-        if (!array_key_exists('password', $recievedData)) $errors[] = "Vous n'avez pas renseigne de propriete 'password'.";
-        if (!array_key_exists('passwordConfirm', $recievedData)) $errors[] = "Vous n'avez pas renseigne de propriete 'passwordConfirm'.";
+        
+        // On vérifie que toutes les propriétées sont bien renseignées
+        if (!array_key_exists('email', $recievedData)) $errors[] = "Vous n'avez pas renseigné de proprietée 'email'.";
+        if (!array_key_exists('username', $recievedData)) $errors[] = "Vous n'avez pas renseigné de proprietée 'username'.";
+        if (!array_key_exists('password', $recievedData)) $errors[] = "Vous n'avez pas renseigné de proprietée 'password'.";
+        if (!array_key_exists('passwordConfirm', $recievedData)) $errors[] = "Vous n'avez pas renseigné de proprietée 'passwordConfirm'.";
 
         if (count($errors) == 0) {
             if ($recievedData['password'] == $recievedData['passwordConfirm']) {
@@ -50,7 +52,7 @@ class PostController extends AbstractController {
                     $manager->persist($user);
                     $manager->flush();
                     $response = new JsonResponse();
-                    $response->setContent($serializer->serialize($user, 'json'));
+                    $response->setContent($serializer->serialize($user, 'json', ['groups' => 'user']));
                     return $response;
                 }
 

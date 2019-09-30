@@ -16,7 +16,7 @@ class GetController extends AbstractController {
     public function getAllUsers(UserRepository $userRepository, SerializerInterface $serializer) {
         if ($users = $userRepository->findAll()) {
             $response = new JsonResponse();
-            $response->setContent($serializer->serialize($users, 'json'));
+            $response->setContent($serializer->serialize($users, 'json', ['groups' => 'user']));
             return $response;
         } else {
             return new Response("Aucun utilisateur présent en base de données.");
@@ -24,7 +24,7 @@ class GetController extends AbstractController {
     }
     
     /** @Route("/user/{slug}") */
-    public function getOneUser(string $slug, UserRepository $userRepository, SerializerInterface $serializer) {
+    public function getOneUser(String $slug, UserRepository $userRepository, SerializerInterface $serializer) {
         if ($user = $userRepository->findOneBySlug($slug)) {
             $response = new JsonResponse();
             $response->setContent($serializer->serialize($user, 'json', ['groups' => 'user']));
