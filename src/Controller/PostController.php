@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Utils\MyFunctions;
 use Cocur\Slugify\Slugify;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\Common\Persistence\ObjectManager;
@@ -20,13 +21,9 @@ class PostController extends AbstractController {
     /** @Route("/user/create") */
     public function userCreate(Request $request, UserPasswordEncoderInterface $encoder, ValidatorInterface $validator, SerializerInterface $serializer, ObjectManager $manager) {
         $recievedData = json_decode($request->getContent(), true);
-        $errors = [];
         
-        // On vérifie que toutes les propriétées sont bien renseignées
-        if (!array_key_exists('email', $recievedData)) $errors[] = "Vous n'avez pas renseigné de proprietée 'email'.";
-        if (!array_key_exists('username', $recievedData)) $errors[] = "Vous n'avez pas renseigné de proprietée 'username'.";
-        if (!array_key_exists('password', $recievedData)) $errors[] = "Vous n'avez pas renseigné de proprietée 'password'.";
-        if (!array_key_exists('passwordConfirm', $recievedData)) $errors[] = "Vous n'avez pas renseigné de proprietée 'passwordConfirm'.";
+        $myFunctions = new MyFunctions();
+        $errors = $myFunctions->multiple_array_key_exist(['email', 'username', 'password', 'passwordConfirm'], $recievedData);
 
         if (count($errors) == 0) {
             if ($recievedData['password'] == $recievedData['passwordConfirm']) {

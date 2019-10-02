@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Utils\MyFunctions;
 use Cocur\Slugify\Slugify;
 use App\Repository\UserRepository;
 use Symfony\Component\HttpFoundation\Request;
@@ -20,17 +21,9 @@ class PutController extends AbstractController {
     /** @Route("/user/{slug}") */
     public function editUser(String $slug, Request $request, UserPasswordEncoderInterface $encoder, ValidatorInterface $validator, SerializerInterface $serializer, ObjectManager $manager, UserRepository $userRepository) {
         $recievedData = json_decode($request->getContent(), true);
-        $errors = [];
 
-        // On vérifie que toutes les propriétées sont bien renseignées
-        if (!array_key_exists('email', $recievedData)) $errors[] = "Vous n'avez pas renseigné de proprietée 'email'.";
-        if (!array_key_exists('username', $recievedData)) $errors[] = "Vous n'avez pas renseigné de proprietée 'username'.";
-        if (!array_key_exists('firstname', $recievedData)) $errors[] = "Vous n'avez pas renseigné de proprietée 'firstname'.";
-        if (!array_key_exists('lastname', $recievedData)) $errors[] = "Vous n'avez pas renseigné de proprietée 'lastname'.";
-        if (!array_key_exists('address', $recievedData)) $errors[] = "Vous n'avez pas renseigné de proprietée 'address'.";
-        if (!array_key_exists('currentPassword', $recievedData)) $errors[] = "Vous n'avez pas renseigné de proprietée 'currentPassword'.";
-        if (!array_key_exists('newPassword', $recievedData)) $errors[] = "Vous n'avez pas renseigné de proprietée 'newPassword'.";
-        if (!array_key_exists('newPasswordConfirm', $recievedData)) $errors[] = "Vous n'avez pas renseigné de proprietée 'newPasswordConfirm'.";
+        $myFunctions = new MyFunctions();
+        $errors = $myFunctions->multiple_array_key_exist(['email', 'username', 'firstname', 'lastname', 'address', 'currentPassword', 'newPassword', 'newPasswordConfirm'], $recievedData);
 
         if (count($errors) == 0) {
             if ($user = $userRepository->findOneBySlug($slug)) {
