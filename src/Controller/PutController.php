@@ -23,7 +23,7 @@ class PutController extends AbstractController {
         $recievedData = json_decode($request->getContent(), true);
 
         $myFunctions = new MyFunctions();
-        $errors = $myFunctions->multiple_array_key_exist(['userId', 'emailNew', 'username', 'firstname', 'lastname', 'address', 'instruments', 'currentPassword', 'newPassword', 'newPasswordConfirm'], $recievedData);
+        $errors = $myFunctions->multiple_array_key_exist(['userId', 'emailNew', 'username', 'firstname', 'lastname', 'address', 'picture', 'instruments', 'currentPassword', 'newPassword', 'newPasswordConfirm'], $recievedData);
 
         if (count($errors) == 0) {
             if ($user = $userRepository->findOneBySlug($slug)) {
@@ -72,6 +72,14 @@ class PutController extends AbstractController {
                                 $user->setAddress($recievedData['address']);
                             } else {
                                 return new Response("La nouvelle adresse est identique à l'ancienne.", Response::HTTP_PRECONDITION_FAILED);
+                            }
+                        }
+                        
+                        if ($recievedData['picture'] != '') {
+                            if ($recievedData['picture'] != $user->getPicture()) {
+                                $user->setPicture($recievedData['picture']);
+                            } else {
+                                return new Response("Le nouvel avatar est identique à l'ancien.", Response::HTTP_PRECONDITION_FAILED);
                             }
                         }
     

@@ -87,6 +87,12 @@ class User implements UserInterface
      */
     private $instruments = [];
 
+    /**
+     * @ORM\Column(type="text", nullable=true)
+     * @Groups({"user"})
+     */
+    private $picture;
+
     public function __construct() {
         $this->createdAt = new \DateTime();
     }
@@ -219,6 +225,18 @@ class User implements UserInterface
     public function setInstruments(?array $instruments): self
     {
         $this->instruments = $instruments;
+
+        return $this;
+    }
+
+    public function getPicture(): ?string
+    {
+        return $this->picture;
+    }
+
+    public function setPicture(?string $picture): self
+    {
+        $this->picture = $picture;
 
         return $this;
     }
