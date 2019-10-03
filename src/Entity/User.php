@@ -81,6 +81,12 @@ class User implements UserInterface
      */
     private $updatedAt;
 
+    /**
+     * @ORM\Column(type="array", nullable=true)
+     * @Groups({"user"})
+     */
+    private $instruments = [];
+
     public function __construct() {
         $this->createdAt = new \DateTime();
     }
@@ -204,4 +210,16 @@ class User implements UserInterface
 
     public function getSalt() {}
     public function eraseCredentials() {}
+
+    public function getInstruments(): ?array
+    {
+        return $this->instruments;
+    }
+
+    public function setInstruments(?array $instruments): self
+    {
+        $this->instruments = $instruments;
+
+        return $this;
+    }
 }

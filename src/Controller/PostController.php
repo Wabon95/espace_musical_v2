@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Utils\MyFunctions;
 use Cocur\Slugify\Slugify;
+use App\Repository\UserRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Component\HttpFoundation\Response;
@@ -55,6 +56,32 @@ class PostController extends AbstractController {
 
             } else {
                 return new Response("Vos mots de passes ne sont pas identiques.", Response::HTTP_PRECONDITION_FAILED);
+            }
+        } elseif (count($errors) > 0) {
+            $response = new JsonResponse();
+            $response->setContent($serializer->serialize($errors, 'json'));
+            return $response;
+        }
+    }
+
+    /** @Route("/user/login") */
+    public function userLogin(Request $request, UserRepository $userRepository, SerializerInterface $serializer) {
+        $recievedData = json_decode($request->getContent(), true);
+
+        $myFunctions = new MyFunctions();
+        $errors = $myFunctions->multiple_array_key_exist(['email', 'password'], $recievedData);
+
+        if (count($errors) == 0) {
+            if ($user = $userRepository->findOneByEmail($recievedData['email'])) {
+                if (password_verify($recievedData['password'], $user->getPassword())) {
+                    $response = new JsonResponse();
+                    $response->setContent($serializer->serialize($user, 'json', ['groups' => 'user']));
+                    return $response;
+                } else {
+                    return new Response("Mot de passe incorrect.", Response::HTTP_UNAUTHORIZED);
+                }
+            } else {
+                return new Response("Adresse email ou pseudo non trouvé.", Response::HTTP_PRECONDITION_FAILED);
             }
         } elseif (count($errors) > 0) {
             $response = new JsonResponse();
