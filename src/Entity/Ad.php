@@ -3,9 +3,13 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\AdRepository")
+ * @UniqueEntity(fields={"title"}, message="Le titre {{ value }} est déjà utilisé, veuillez en choisir un autre.")
  */
 class Ad
 {
@@ -13,31 +17,42 @@ class Ad
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups({"ad"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank(message="Vous devez renseigner un titre d'annonce.")
+     * @Assert\Length(min=20, minMessage="Vous devez renseigner un titre d'annonce d'au moins {{ limit }} caractères.")
+     * @Groups({"ad"})
      */
     private $title;
 
     /**
      * @ORM\Column(type="text")
+     * @Assert\NotBlank(message="Vous devez renseigner un contenu d'annonce.")
+     * @Assert\Length(min=50, minMessage="Vous devez renseigner un titre d'annonce d'au moins {{ limit }} caractères.")
+     * @Groups({"ad"})
      */
     private $content;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank(message="Vous devez renseigner un type d'annonce (Vente ou Recherche).")
+     * @Groups({"ad"})
      */
     private $type;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"ad"})
      */
     private $price;
 
     /**
-     * @ORM\Column(type="text", nullable=true)
+     * @ORM\Column(type="array", nullable=true)
+     * @Groups({"ad"})
      */
     private $pictures;
 
@@ -54,13 +69,20 @@ class Ad
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="ads")
      * @ORM\JoinColumn(nullable=false)
+     * @Assert\NotBlank(message="Vous devez renseigner un annonceur.")
+     * @Groups({"ad"})
      */
     private $author;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"ad"})
      */
     private $slug;
+
+    public function __construct() {
+        $this->createdAt = new \DateTime();
+    }
 
     public function getId(): ?int
     {
@@ -115,12 +137,12 @@ class Ad
         return $this;
     }
 
-    public function getPictures(): ?string
+    public function getPictures(): ?array
     {
         return $this->pictures;
     }
 
-    public function setPictures(?string $pictures): self
+    public function setPictures(?array $pictures): self
     {
         $this->pictures = $pictures;
 

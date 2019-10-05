@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Ad;
 use App\Entity\User;
 use App\Utils\MyFunctions;
 use Cocur\Slugify\Slugify;
@@ -24,18 +25,18 @@ class PostController extends AbstractController {
         $recievedData = json_decode($request->getContent(), true);
         
         $myFunctions = new MyFunctions();
-        $errors = $myFunctions->multiple_array_key_exist([ 'email', 'username', 'password', 'passwordConfirm' ], $recievedData);
+        $errors = $myFunctions->multiple_array_key_exist(['email', 'username', 'password', 'passwordConfirm'], $recievedData);
 
         if (count($errors) == 0) {
             if ($recievedData['password'] == $recievedData['passwordConfirm']) {
                 $slugify = new Slugify();
                 $user = new User();
-    
+
                 $user
                     ->setEmail($recievedData['email'])
                     ->setUsername($recievedData['username'])
-                    ->setPassword($recievedData['password'])
                     ->setSlug($slugify->slugify($recievedData['username']))
+                    ->setPassword($recievedData['password'])
                 ;
     
                 // On vérifie les contraintes de validation
@@ -91,7 +92,50 @@ class PostController extends AbstractController {
     }
 
     /** @Route("/ad/create") */
-    public function adCreate() {
+    public function adCreate(Request $request, ValidatorInterface $validator, UserRepository $userRepository, SerializerInterface $serializer, ObjectManager $manager) {
+        $recievedData = json_decode($request->getContent(), true);
+
+        $myFunctions = new MyFunctions();
+        $errors = $myFunctions->multiple_array_key_exist(['author', 'title', 'content', 'type', 'price', 'pictures'], $recievedData);
+
+        if (count($errors) == 0) {
+            $slugify = new Slugify();
+            $ad = new Ad();
+
+            if ($user = $userRepository->find($recievedData['author'])) {
+                $ad
+                    ->setTitle($recievedData['title'])
+                    ->setContent($recievedData['content'])
+                    ->setType($recievedData['type'])
+                    ->setAuthor($user)
+                    ->setSlug($slugify->slugify($recievedData['title']))
+                ;
+            } else {
+                return new Response("Aucun utilisateur avec cet id présent en base de données.", Response::HTTP_NOT_FOUND);
+            }
+            if ($recievedData['price'] != '') $ad->setPrice($recievedData['price']);
+            if (count($recievedData['pictures']) > 0) $ad->setPictures($recievedData['pictures']);
+
+            $violations = $validator->validate($ad);
+
+            if (count($violations) > 0) {
+                $response = new JsonResponse();
+                $response->setContent($serializer->serialize($violations, 'json'));
+                return $response;
+            } else {
+                $manager->persist($ad);
+                $manager->flush();
+                $response = new JsonResponse();
+                $response->setContent($serializer->serialize($ad, 'json', ['groups' => 'ad']));
+                return $response;
+            }
+        } elseif (count($errors) > 0) {
+            $response = new JsonResponse();
+            $response->setContent($serializer->serialize($errors, 'json'));
+            return $response;
+        }
+
+
         // TODO: Récupérer les informations de la requête et les convertirs en tableau PHP.
         // TODO: Vérifier la présence de toutes les propriétés nécessaire dans le Json fourni.
         // TODO: Intancier la classe Ad, et y inclure les données fournies, y compris l'auteur de l'ad.

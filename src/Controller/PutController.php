@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Utils\MyFunctions;
 use Cocur\Slugify\Slugify;
+use App\Repository\AdRepository;
 use App\Repository\UserRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\Common\Persistence\ObjectManager;
@@ -23,7 +24,7 @@ class PutController extends AbstractController {
         $recievedData = json_decode($request->getContent(), true);
 
         $myFunctions = new MyFunctions();
-        $errors = $myFunctions->multiple_array_key_exist([ 'userId', 'emailNew', 'username', 'firstname', 'lastname', 'address', 'picture', 'instruments', 'currentPassword', 'newPassword', 'newPasswordConfirm' ], $recievedData);
+        $errors = $myFunctions->multiple_array_key_exist(['userId', 'emailNew', 'username', 'firstname', 'lastname', 'address', 'picture', 'instruments', 'currentPassword', 'newPassword', 'newPasswordConfirm'], $recievedData);
 
         if (count($errors) == 0) {
             if ($user = $userRepository->findOneBySlug($slug)) {
@@ -31,64 +32,36 @@ class PutController extends AbstractController {
                     if (password_verify($recievedData['currentPassword'], $user->getPassword())) {
                         $passwordHasModified = false;
     
-                        if ($recievedData['emailNew'] != '') {
-                            if ($recievedData['emailNew'] != $user->getEmail()) {
-                                $user->setEmail($recievedData['emailNew']);
-                            } else {
-                                return new Response("La nouvelle adresse email est identique à l'ancienne.", Response::HTTP_PRECONDITION_FAILED);
-                            }
+                        if ($recievedData['emailNew'] != $user->getEmail()) {
+                            $user->setEmail($recievedData['emailNew']);
                         }
     
-                        if ($recievedData['username'] != '') {
-                            if ($recievedData['username'] != $user->getUsername()) {
-                                $slugify = new Slugify();
-                                $user
-                                    ->setUsername($recievedData['username'])
-                                    ->setSlug($slugify->slugify($recievedData['username']))    
-                                ;
-                            } else {
-                                return new Response("Le nouveau pseudo est identique à l'ancien.", Response::HTTP_PRECONDITION_FAILED);
-                            }
+                        if ($recievedData['username'] != $user->getUsername()) {
+                            $slugify = new Slugify();
+                            $user
+                                ->setUsername($recievedData['username'])
+                                ->setSlug($slugify->slugify($recievedData['username']))    
+                            ;
                         }
     
-                        if ($recievedData['firstname'] != '') {
-                            if ($recievedData['firstname'] != $user->getFirstname()) {
-                                $user->setFirstname($recievedData['firstname']);
-                            } else {
-                                return new Response("Le nouveau prénom est identique à l'ancien.", Response::HTTP_PRECONDITION_FAILED);
-                            }
+                        if ($recievedData['firstname'] != $user->getFirstname()) {
+                            $user->setFirstname($recievedData['firstname']);
                         }
     
-                        if ($recievedData['lastname'] != '') {
-                            if ($recievedData['lastname'] != $user->getLastname()) {
-                                $user->setLastname($recievedData['lastname']);
-                            } else {
-                                return new Response("Le nouveau nom est identique à l'ancien.", Response::HTTP_PRECONDITION_FAILED);
-                            }
+                        if ($recievedData['lastname'] != $user->getLastname()) {
+                            $user->setLastname($recievedData['lastname']);
                         }
     
-                        if ($recievedData['address'] != '') {
-                            if ($recievedData['address'] != $user->getAddress()) {
-                                $user->setAddress($recievedData['address']);
-                            } else {
-                                return new Response("La nouvelle adresse est identique à l'ancienne.", Response::HTTP_PRECONDITION_FAILED);
-                            }
+                        if ($recievedData['address'] != $user->getAddress()) {
+                            $user->setAddress($recievedData['address']);
                         }
                         
-                        if ($recievedData['picture'] != '') {
-                            if ($recievedData['picture'] != $user->getPicture()) {
-                                $user->setPicture($recievedData['picture']);
-                            } else {
-                                return new Response("Le nouvel avatar est identique à l'ancien.", Response::HTTP_PRECONDITION_FAILED);
-                            }
+                        if ($recievedData['picture'] != $user->getPicture()) {
+                            $user->setPicture($recievedData['picture']);
                         }
     
-                        if (count($recievedData['instruments']) > 0) {
-                            if ($recievedData['instruments'] != $user->getInstruments()) {
-                                $user->setInstruments($recievedData['instruments']);
-                            } else {
-                                return new Response("Vos nouveaux instruments sont identiques aux anciens.", Response::HTTP_PRECONDITION_FAILED);
-                            }
+                        if ($recievedData['instruments'] != $user->getInstruments()) {
+                            $user->setInstruments($recievedData['instruments']);
                         }
     
                         if ($recievedData['newPassword'] != '' || $recievedData['newPasswordConfirm'] != '') {
@@ -104,7 +77,6 @@ class PutController extends AbstractController {
                             }
                         }
     
-                        // On vérifie les contraintes de validation
                         $violations = $validator->validate($user);
     
                         if (count($violations) > 0) {
@@ -137,13 +109,63 @@ class PutController extends AbstractController {
     }
 
     /** @Route("/ad/{slug}") */
-    public function adEdit() {
-        // TODO: Récupérer les informations de la requête et les convertirs en tableau PHP.
-        // TODO: Vérifier la présence de toutes les propriétés nécessaire dans le Json fourni.
-        // TODO: Vérifier que l'utilisateur fourni en paramètre est bien l'auteur de l'ad à modifier.
-        // TODO: Récupérer la class ad correspondant à la bonne ad, et y modifier les données.
-        // TODO: Vérifier que les données fournies sont correcte à l'aide du validateur de contraintes Doctrine.
-        // TODO: Envoyer les données en base de données.
-        // TODO: Retourner l'ad modifiée en Json.
+    public function adEdit(String $slug, Request $request, ValidatorInterface $validator, SerializerInterface $serializer, ObjectManager $manager, AdRepository $adRepository, UserRepository $userRepository) {
+        $recievedData = json_decode($request->getContent(), true);
+
+        $myFunctions = new MyFunctions();
+        $errors = $myFunctions->multiple_array_key_exist(['author', 'title', 'content', 'type', 'price', 'pictures'], $recievedData);
+
+        if (count($errors) == 0) {
+            if ($ad = $adRepository->findOneBySlug($slug)) {
+                if ($ad->getAuthor()->getId() == $recievedData['author']) {
+
+                    if ($recievedData['title'] != $ad->getTitle()) {
+                        $slugify = new Slugify();
+                        $ad
+                            ->setTitle($recievedData['title'])
+                            ->setSlug($slugify->slugify($recievedData['title']))    
+                        ;
+                    }
+
+                    if ($recievedData['content'] != $ad->getContent()) {
+                        $ad->setContent($recievedData['content']);
+                    }
+
+                    if ($recievedData['type'] != $ad->getType()) {
+                        $ad->setType($recievedData['type']);
+                    }
+
+                    if ($recievedData['price'] != $ad->getPrice()) {
+                        $ad->setPrice($recievedData['price']);
+                    }
+
+                    if ($recievedData['pictures'] != $ad->getPictures()) {
+                        $ad->setPictures($recievedData['pictures']);
+                    }
+
+                    $violations = $validator->validate($ad);
+
+                    if (count($violations) > 0) {
+                        $response = new JsonResponse();
+                        $response->setContent($serializer->serialize($violations, 'json'));
+                        return $response;
+                    } else {
+                        $manager->persist($ad);
+                        $manager->flush();
+                        $response = new JsonResponse();
+                        $response->setContent($serializer->serialize($ad, 'json', ['groups' => 'ad']));
+                        return $response;
+                    }
+                } else {
+                    return new Response("Seul l'auteur est autorisé à modifier son annonce.", Response::HTTP_UNAUTHORIZED);
+                }
+            } else {
+                return new Response("L'annonce demandée n'a pas été trouvée en base de données.", Response::HTTP_NOT_FOUND);
+            }
+        } elseif (count($errors) > 0) {
+            $response = new JsonResponse();
+            $response->setContent($serializer->serialize($errors, 'json'));
+            return $response;
+        }
     }
 }

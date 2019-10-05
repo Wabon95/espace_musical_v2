@@ -1,12 +1,5 @@
 <?php
 
-// TODO: Contraintes entité Ad
-// TODO: méthode d'ajout Ad
-// TODO: Méthode de récupération de toutes les ads
-// TODO: Méthode de récupération d'une ad en particulier via son slug
-// TODO: méthode de modification Ad
-// TODO: méthode de suppression Ad
-
 namespace App\Utils;
 
 class MyFunctions {

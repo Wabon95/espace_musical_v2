@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Repository\AdRepository;
 use App\Repository\UserRepository;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -19,7 +20,7 @@ class GetController extends AbstractController {
             $response->setContent($serializer->serialize($users, 'json', ['groups' => 'user']));
             return $response;
         } else {
-            return new Response("Aucun utilisateur présent en base de données.");
+            return new Response("Aucun utilisateur présent en base de données.", Response::HTTP_NOT_FOUND);
         }
     }
     
@@ -35,12 +36,24 @@ class GetController extends AbstractController {
     }
 
     /** @Route("/ad/findAll") */
-    public function getAllAds() {
-        // TODO: Vérifier la présence d'ads en base de données, et auquel cas les renvoyer en Json.
+    public function getAllAds(AdRepository $adRepository, SerializerInterface $serializer) {
+        if ($ads = $adRepository->findAll()) {
+            $response = new JsonResponse();
+            $response->setContent($serializer->serialize($ads, 'json', ['groups' => 'ad']));
+            return $response;
+        } else {
+            return new Response("Aucune annonce présente en base de données.", Response::HTTP_NOT_FOUND);
+        }
     }
 
     /** @Route("/ad/{slug}") */
-    public function getOneAd() {
-        // TODO: Vérifier la présence de l'ad en bdd grâce à son slug fourni dans l'url, et auquel cas la renvoyer en Json.
+    public function getOneAd(String $slug, AdRepository $adRepository, SerializerInterface $serializer) {
+        if ($ad = $adRepository->findOneBySlug($slug)) {
+            $response = new JsonResponse();
+            $response->setContent($serializer->serialize($ad, 'json', ['groups' => 'ad']));
+            return $response;
+        } else {
+            return new Response("L'annonce demandée n'a pas été trouvée en base de données.", Response::HTTP_NOT_FOUND);
+        }
     }
 }

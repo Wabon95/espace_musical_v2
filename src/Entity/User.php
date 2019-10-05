@@ -22,13 +22,13 @@ class User implements UserInterface
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
-     * @Groups({"user"})
+     * @Groups({"user", "ad"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"user"})
+     * @Groups({"user", "ad"})
      * @Assert\Email(message="L'adresse email '{{ value }}' n'est pas valide.")
      * @Assert\NotBlank(message="Vous devez renseigner une adresse email.")
      */
@@ -36,7 +36,7 @@ class User implements UserInterface
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"user"})
+     * @Groups({"user", "ad"})
      * @Assert\Length(min = 5, minMessage = "Votre pseudo doit contenir au minimum {{ limit }} caractères.")
      * @Assert\NotBlank(message="Vous devez renseigner un pseudo.")
      */
@@ -51,25 +51,25 @@ class User implements UserInterface
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"user"})
+     * @Groups({"user", "ad"})
      */
     private $slug;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * @Groups({"user"})
+     * @Groups({"user", "ad"})
      */
     private $address;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * @Groups({"user"})
+     * @Groups({"user", "ad"})
      */
     private $firstname;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * @Groups({"user"})
+     * @Groups({"user", "ad"})
      */
     private $lastname;
 
@@ -85,7 +85,7 @@ class User implements UserInterface
 
     /**
      * @ORM\Column(type="array", nullable=true)
-     * @Groups({"user"})
+     * @Groups({"user", "ad"})
      */
     private $instruments = [];
 
