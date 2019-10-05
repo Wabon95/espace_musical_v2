@@ -23,7 +23,7 @@ class PutController extends AbstractController {
         $recievedData = json_decode($request->getContent(), true);
 
         $myFunctions = new MyFunctions();
-        $errors = $myFunctions->multiple_array_key_exist(['userId', 'emailNew', 'username', 'firstname', 'lastname', 'address', 'picture', 'instruments', 'currentPassword', 'newPassword', 'newPasswordConfirm'], $recievedData);
+        $errors = $myFunctions->multiple_array_key_exist([ 'userId', 'emailNew', 'username', 'firstname', 'lastname', 'address', 'picture', 'instruments', 'currentPassword', 'newPassword', 'newPasswordConfirm' ], $recievedData);
 
         if (count($errors) == 0) {
             if ($user = $userRepository->findOneBySlug($slug)) {
@@ -134,5 +134,16 @@ class PutController extends AbstractController {
             $response->setContent($serializer->serialize($errors, 'json'));
             return $response;
         }
+    }
+
+    /** @Route("/ad/{slug}") */
+    public function adEdit() {
+        // TODO: Récupérer les informations de la requête et les convertirs en tableau PHP.
+        // TODO: Vérifier la présence de toutes les propriétés nécessaire dans le Json fourni.
+        // TODO: Vérifier que l'utilisateur fourni en paramètre est bien l'auteur de l'ad à modifier.
+        // TODO: Récupérer la class ad correspondant à la bonne ad, et y modifier les données.
+        // TODO: Vérifier que les données fournies sont correcte à l'aide du validateur de contraintes Doctrine.
+        // TODO: Envoyer les données en base de données.
+        // TODO: Retourner l'ad modifiée en Json.
     }
 }

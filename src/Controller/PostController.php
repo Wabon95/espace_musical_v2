@@ -24,7 +24,7 @@ class PostController extends AbstractController {
         $recievedData = json_decode($request->getContent(), true);
         
         $myFunctions = new MyFunctions();
-        $errors = $myFunctions->multiple_array_key_exist(['email', 'username', 'password', 'passwordConfirm'], $recievedData);
+        $errors = $myFunctions->multiple_array_key_exist([ 'email', 'username', 'password', 'passwordConfirm' ], $recievedData);
 
         if (count($errors) == 0) {
             if ($recievedData['password'] == $recievedData['passwordConfirm']) {
@@ -88,5 +88,15 @@ class PostController extends AbstractController {
             $response->setContent($serializer->serialize($errors, 'json'));
             return $response;
         }
+    }
+
+    /** @Route("/ad/create") */
+    public function adCreate() {
+        // TODO: Récupérer les informations de la requête et les convertirs en tableau PHP.
+        // TODO: Vérifier la présence de toutes les propriétés nécessaire dans le Json fourni.
+        // TODO: Intancier la classe Ad, et y inclure les données fournies, y compris l'auteur de l'ad.
+        // TODO: Vérifier que les données fournies sont correcte à l'aide du validateur de contraintes Doctrine.
+        // TODO: Envoyer les données en base de données.
+        // TODO: Retourner l'ad crée en Json.
     }
 }
