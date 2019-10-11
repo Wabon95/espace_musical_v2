@@ -22,13 +22,13 @@ class User implements UserInterface
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
-     * @Groups({"user", "ad"})
+     * @Groups({"user", "ad", "event"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"user", "ad"})
+     * @Groups({"user", "ad", "event"})
      * @Assert\Email(message="L'adresse email '{{ value }}' n'est pas valide.")
      * @Assert\NotBlank(message="Vous devez renseigner une adresse email.")
      */
@@ -36,7 +36,7 @@ class User implements UserInterface
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"user", "ad"})
+     * @Groups({"user", "ad", "event"})
      * @Assert\Length(min = 5, minMessage = "Votre pseudo doit contenir au minimum {{ limit }} caractères.")
      * @Assert\NotBlank(message="Vous devez renseigner un pseudo.")
      */
@@ -51,25 +51,25 @@ class User implements UserInterface
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"user", "ad"})
+     * @Groups({"user", "ad", "event"})
      */
     private $slug;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * @Groups({"user", "ad"})
+     * @Groups({"user", "ad", "event"})
      */
     private $address;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * @Groups({"user", "ad"})
+     * @Groups({"user", "ad", "event"})
      */
     private $firstname;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * @Groups({"user", "ad"})
+     * @Groups({"user", "ad", "event"})
      */
     private $lastname;
 
@@ -85,7 +85,7 @@ class User implements UserInterface
 
     /**
      * @ORM\Column(type="array", nullable=true)
-     * @Groups({"user", "ad"})
+     * @Groups({"user", "ad", "event"})
      */
     private $instruments = [];
 
@@ -100,9 +100,15 @@ class User implements UserInterface
      */
     private $ads;
 
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Event", mappedBy="author")
+     */
+    private $events;
+
     public function __construct() {
         $this->createdAt = new \DateTime();
         $this->ads = new ArrayCollection();
+        $this->events = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -274,6 +280,37 @@ class User implements UserInterface
             // set the owning side to null (unless already changed)
             if ($ad->getAuthor() === $this) {
                 $ad->setAuthor(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Event[]
+     */
+    public function getEvents(): Collection
+    {
+        return $this->events;
+    }
+
+    public function addEvent(Event $event): self
+    {
+        if (!$this->events->contains($event)) {
+            $this->events[] = $event;
+            $event->setAuthor($this);
+        }
+
+        return $this;
+    }
+
+    public function removeEvent(Event $event): self
+    {
+        if ($this->events->contains($event)) {
+            $this->events->removeElement($event);
+            // set the owning side to null (unless already changed)
+            if ($event->getAuthor() === $this) {
+                $event->setAuthor(null);
             }
         }
 

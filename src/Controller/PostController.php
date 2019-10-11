@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Ad;
 use App\Entity\User;
+use App\Entity\Event;
 use App\Utils\MyFunctions;
 use Cocur\Slugify\Slugify;
 use App\Repository\UserRepository;
@@ -99,10 +100,9 @@ class PostController extends AbstractController {
         $errors = $myFunctions->multiple_array_key_exist(['author', 'title', 'content', 'type', 'price', 'pictures'], $recievedData);
 
         if (count($errors) == 0) {
-            $slugify = new Slugify();
-            $ad = new Ad();
-
             if ($user = $userRepository->find($recievedData['author'])) {
+                $slugify = new Slugify();
+                $ad = new Ad();
                 $ad
                     ->setTitle($recievedData['title'])
                     ->setContent($recievedData['content'])
@@ -110,11 +110,11 @@ class PostController extends AbstractController {
                     ->setAuthor($user)
                     ->setSlug($slugify->slugify($recievedData['title']))
                 ;
+                if ($recievedData['price'] != '') $ad->setPrice($recievedData['price']);
+                if (count($recievedData['pictures']) > 0) $ad->setPictures($recievedData['pictures']);
             } else {
                 return new Response("Aucun utilisateur avec cet id présent en base de données.", Response::HTTP_NOT_FOUND);
             }
-            if ($recievedData['price'] != '') $ad->setPrice($recievedData['price']);
-            if (count($recievedData['pictures']) > 0) $ad->setPictures($recievedData['pictures']);
 
             $violations = $validator->validate($ad);
 
@@ -134,13 +134,58 @@ class PostController extends AbstractController {
             $response->setContent($serializer->serialize($errors, 'json'));
             return $response;
         }
+    }
 
+    /** @Route("/event/create") */
+    public function eventCreate(Request $request, ValidatorInterface $validator, UserRepository $userRepository, SerializerInterface $serializer, ObjectManager $manager) {
+        $recievedData = json_decode($request->getContent(), true);
 
-        // TODO: Récupérer les informations de la requête et les convertirs en tableau PHP.
-        // TODO: Vérifier la présence de toutes les propriétés nécessaire dans le Json fourni.
-        // TODO: Intancier la classe Ad, et y inclure les données fournies, y compris l'auteur de l'ad.
-        // TODO: Vérifier que les données fournies sont correcte à l'aide du validateur de contraintes Doctrine.
-        // TODO: Envoyer les données en base de données.
-        // TODO: Retourner l'ad crée en Json.
+        $myFunctions = new MyFunctions();
+        $errors = $myFunctions->multiple_array_key_exist(['type', 'title', 'description', 'location', 'start_date', 'end_date', 'artists', 'price', 'pictures', 'author'], $recievedData);
+
+        if (count($errors) == 0) {
+            if ($user = $userRepository->find($recievedData['author'])) {
+                $slugify = new Slugify();
+                $event = new Event();
+                $startDate = new \DateTime();
+                $startDate->setTimestamp($recievedData['start_date']);
+                $endDate = new \DateTime();
+                $endDate->setTimestamp($recievedData['end_date']);
+
+                $event
+                    ->setType($recievedData['type'])
+                    ->setTitle($recievedData['title'])
+                    ->setSlug($slugify->slugify($recievedData['title']))
+                    ->setDescription($recievedData['description'])
+                    ->setLocation($recievedData['location'])
+                    ->setArtists($recievedData['artists'])
+                    ->setStartDate($startDate)
+                    ->setEndDate($endDate)
+                    ->setAuthor($user)
+                ;
+                if ($recievedData['price'] != '') $event->setPrice($recievedData['price']);
+                if (count($recievedData['pictures']) > 0) $event->setPictures($recievedData['pictures']);
+
+                $violations = $validator->validate($event);
+
+                if (count($violations) > 0) {
+                    $response = new JsonResponse();
+                    $response->setContent($serializer->serialize($violations, 'json'));
+                    return $response;
+                } else {
+                    $manager->persist($event);
+                    $manager->flush();
+                    $response = new JsonResponse();
+                    $response->setContent($serializer->serialize($event, 'json', ['groups' => 'event']));
+                    return $response;
+                }
+            } else {
+                return new Response("Aucun utilisateur avec cet id présent en base de données.", Response::HTTP_NOT_FOUND);
+            }
+        } elseif (count($errors) > 0) {
+            $response = new JsonResponse();
+            $response->setContent($serializer->serialize($errors, 'json'));
+            return $response;
+        }
     }
 }
