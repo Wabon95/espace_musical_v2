@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Repository\AdRepository;
 use App\Repository\UserRepository;
+use App\Repository\EventRepository;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -54,6 +55,17 @@ class GetController extends AbstractController {
             return $response;
         } else {
             return new Response("L'annonce demandée n'a pas été trouvée en base de données.", Response::HTTP_NOT_FOUND);
+        }
+    }
+
+    /** @Route("/event/findAll") */
+    public function getAllEvents(EventRepository $eventRepository, SerializerInterface $serializer) {
+        if ($events = $eventRepository->findAll()) {
+            $response = new JsonResponse();
+            $response->setContent($serializer->serialize($events, 'json', ['groups' => 'event']));
+            return $response;
+        } else {
+            return new Response("Aucun évènements présent en base de données.", Response::HTTP_NOT_FOUND);
         }
     }
 }
