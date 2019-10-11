@@ -68,4 +68,15 @@ class GetController extends AbstractController {
             return new Response("Aucun évènements présent en base de données.", Response::HTTP_NOT_FOUND);
         }
     }
+
+    /** @Route("/event/{slug}") */
+    public function getOneEvent(String $slug, EventRepository $eventRepository, SerializerInterface $serializer) {
+        if ($event = $eventRepository->findOneBySlug($slug)) {
+            $response = new JsonResponse();
+            $response->setContent($serializer->serialize($event, 'json', ['groups' => 'event']));
+            return $response;
+        } else {
+            return new Response("L'event demandé n'a pas été trouvé en base de données.", Response::HTTP_NOT_FOUND);
+        }
+    }
 }
