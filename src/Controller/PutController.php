@@ -240,7 +240,6 @@ class PutController extends AbstractController {
             } else {
                 return new Response("L'évènement demandé n'a pas été trouvé en base de données.", Response::HTTP_NOT_FOUND);
             }
-
         } elseif (count($errors) > 0) {
             $response = new JsonResponse();
             $response->setContent($serializer->serialize($errors, 'json'));
