@@ -147,10 +147,7 @@ class PostController extends AbstractController {
             if ($user = $userRepository->find($recievedData['author'])) {
                 $slugify = new Slugify();
                 $event = new Event();
-                $startDate = new \DateTime();
-                $startDate->setTimestamp($recievedData['start_date']);
-                $endDate = new \DateTime();
-                $endDate->setTimestamp($recievedData['end_date']);
+                $myFunctions = new MyFunctions();
 
                 $event
                     ->setType($recievedData['type'])
@@ -159,8 +156,8 @@ class PostController extends AbstractController {
                     ->setDescription($recievedData['description'])
                     ->setLocation($recievedData['location'])
                     ->setArtists($recievedData['artists'])
-                    ->setStartDate($startDate)
-                    ->setEndDate($endDate)
+                    ->setStartDate($myFunctions->timestampToDatetime($recievedData['start_date']))
+                    ->setEndDate($myFunctions->timestampToDatetime($recievedData['end_date']))
                     ->setAuthor($user)
                 ;
                 if ($recievedData['price'] != '') $event->setPrice($recievedData['price']);

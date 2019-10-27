@@ -6,6 +6,7 @@ use App\Utils\MyFunctions;
 use Cocur\Slugify\Slugify;
 use App\Repository\AdRepository;
 use App\Repository\UserRepository;
+use App\Repository\EventRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Component\HttpFoundation\Response;
@@ -162,6 +163,84 @@ class PutController extends AbstractController {
             } else {
                 return new Response("L'annonce demandée n'a pas été trouvée en base de données.", Response::HTTP_NOT_FOUND);
             }
+        } elseif (count($errors) > 0) {
+            $response = new JsonResponse();
+            $response->setContent($serializer->serialize($errors, 'json'));
+            return $response;
+        }
+    }
+
+    /** @Route("/event/{slug}") */
+    public function eventEdit(String $slug, Request $request, ValidatorInterface $validator, SerializerInterface $serializer, EventRepository $eventRepository, ObjectManager $manager) {
+        $recievedData = json_decode($request->getContent(), true);
+
+        $myFunctions = new MyFunctions();
+        $errors = $myFunctions->multiple_array_key_exist(['author', 'title', 'type', 'price', 'pictures', 'start_date', 'end_date', 'location', 'artists', 'description'], $recievedData);
+        
+        if (count($errors) == 0) {
+            if ($event = $eventRepository->findOneBySlug($slug)) {
+                if ($event->getAuthor()->getId() == $recievedData['author']) {
+
+                    if ($recievedData['title'] != $event->getTitle()) {
+                        $slugify = new Slugify();
+                        $event
+                            ->setTitle($recievedData['title'])
+                            ->setSlug($slugify->slugify($recievedData['title']))    
+                        ;
+                    }
+
+                    if ($recievedData['type'] != $event->getType()) {
+                        $event->setType($recievedData['type']);
+                    }
+
+                    if ($recievedData['location'] != $event->getLocation()) {
+                        $event->setLocation($recievedData['location']);
+                    }
+
+                    if ($recievedData['artists'] != $event->getArtists()) {
+                        $event->setArtists($recievedData['artists']);
+                    }
+
+                    if ($recievedData['description'] != $event->getDescription()) {
+                        $event->setDescription($recievedData['description']);
+                    }
+
+                    if ($recievedData['price'] != $event->getPrice()) {
+                        $event->setPrice($recievedData['price']);
+                    }
+
+                    if ($recievedData['pictures'] != $event->getPictures()) {
+                        $event->setPictures($recievedData['pictures']);
+                    }
+
+                    if ($recievedData['start_date'] != $event->getStartDate()->getTimestamp()) {
+                        $event->setStartDate($myFunctions->timestampToDatetime($recievedData['start_date']));
+                    }
+
+                    if ($recievedData['end_date'] != $event->getEndDate()->getTimestamp()) {
+                        $event->setEndDate($myFunctions->timestampToDatetime($recievedData['end_date']));
+                    }
+
+                    $violations = $validator->validate($event);
+
+                    if (count($violations) > 0) {
+                        $response = new JsonResponse();
+                        $response->setContent($serializer->serialize($violations, 'json'));
+                        return $response;
+                    } else {
+                        $manager->persist($event);
+                        $manager->flush();
+                        $response = new JsonResponse();
+                        $response->setContent($serializer->serialize($event, 'json', ['groups' => 'event']));
+                        return $response;
+                    }
+                } else {
+                    return new Response("Seul l'auteur est autorisé à modifier son évènement.", Response::HTTP_UNAUTHORIZED);
+                }
+            } else {
+                return new Response("L'évènement demandé n'a pas été trouvé en base de données.", Response::HTTP_NOT_FOUND);
+            }
+
         } elseif (count($errors) > 0) {
             $response = new JsonResponse();
             $response->setContent($serializer->serialize($errors, 'json'));

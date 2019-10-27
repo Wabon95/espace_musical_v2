@@ -14,7 +14,6 @@ class MyFunctions {
         return $errors;
     }
 
-    // ? A tester
     public function timestampToDatetime(String $timestamp) {
         $dateTime = new \DateTime();
         $dateTime->setTimestamp($timestamp);
