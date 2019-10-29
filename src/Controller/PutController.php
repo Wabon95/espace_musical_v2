@@ -82,7 +82,10 @@ class PutController extends AbstractController {
     
                         if (count($violations) > 0) {
                             $response = new JsonResponse();
-                            $response->setContent($serializer->serialize($violations, 'json'));
+                            $response
+                                ->setContent($serializer->serialize($violations, 'json'))
+                                ->setStatusCode(400, "Une erreur est survenue.")
+                            ;
                             return $response;
                         } else {
                             if ($passwordHasModified) $user->setPassword($encoder->encodePassword($user, $recievedData['newPassword']));
@@ -104,7 +107,10 @@ class PutController extends AbstractController {
             }
         } elseif (count($errors) > 0) {
             $response = new JsonResponse();
-            $response->setContent($serializer->serialize($errors, 'json'));
+            $response
+                ->setContent($serializer->serialize($violations, 'json'))
+                ->setStatusCode(400, "Une erreur est survenue.")
+            ;
             return $response;
         }
     }
@@ -148,7 +154,10 @@ class PutController extends AbstractController {
 
                     if (count($violations) > 0) {
                         $response = new JsonResponse();
-                        $response->setContent($serializer->serialize($violations, 'json'));
+                        $response
+                            ->setContent($serializer->serialize($violations, 'json'))
+                            ->setStatusCode(400, "Une erreur est survenue.")
+                        ;
                         return $response;
                     } else {
                         $manager->persist($ad);
@@ -165,7 +174,10 @@ class PutController extends AbstractController {
             }
         } elseif (count($errors) > 0) {
             $response = new JsonResponse();
-            $response->setContent($serializer->serialize($errors, 'json'));
+            $response
+                ->setContent($serializer->serialize($violations, 'json'))
+                ->setStatusCode(400, "Une erreur est survenue.")
+            ;
             return $response;
         }
     }
@@ -225,7 +237,10 @@ class PutController extends AbstractController {
 
                     if (count($violations) > 0) {
                         $response = new JsonResponse();
-                        $response->setContent($serializer->serialize($violations, 'json'));
+                        $response
+                            ->setContent($serializer->serialize($violations, 'json'))
+                            ->setStatusCode(400, "Une erreur est survenue.")
+                        ;
                         return $response;
                     } else {
                         $manager->persist($event);
@@ -242,7 +257,10 @@ class PutController extends AbstractController {
             }
         } elseif (count($errors) > 0) {
             $response = new JsonResponse();
-            $response->setContent($serializer->serialize($errors, 'json'));
+            $response
+                ->setContent($serializer->serialize($violations, 'json'))
+                ->setStatusCode(400, "Une erreur est survenue.")
+            ;
             return $response;
         }
     }
