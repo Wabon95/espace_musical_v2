@@ -61,6 +61,12 @@ class GetController extends AbstractController {
     /** @Route("/event/findAll") */
     public function getAllEvents(EventRepository $eventRepository, SerializerInterface $serializer) {
         if ($events = $eventRepository->findAll()) {
+            foreach ($events as $event) {
+                $event
+                    ->setStartDate($event->getStartDate()->getTimestamp())
+                    ->setEndDate($event->getEndDate()->getTimestamp())
+                ;
+            }
             $response = new JsonResponse();
             $response->setContent($serializer->serialize($events, 'json', ['groups' => 'event']));
             return $response;
@@ -72,6 +78,10 @@ class GetController extends AbstractController {
     /** @Route("/event/{slug}") */
     public function getOneEvent(String $slug, EventRepository $eventRepository, SerializerInterface $serializer) {
         if ($event = $eventRepository->findOneBySlug($slug)) {
+            $event
+                ->setStartDate($event->getStartDate()->getTimestamp())
+                ->setEndDate($event->getEndDate()->getTimestamp())
+            ;
             $response = new JsonResponse();
             $response->setContent($serializer->serialize($event, 'json', ['groups' => 'event']));
             return $response;
