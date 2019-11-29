@@ -19,4 +19,13 @@ class MyFunctions {
         $dateTime->setTimestamp($timestamp);
         return $dateTime;
     }
+
+    public function returnErrorMessage(string $message) {
+        $stringToReturnInJson = [
+            'violations' => [[
+                'title' => $message
+            ]]
+        ];
+        return json_encode($stringToReturnInJson);
+    }
 }

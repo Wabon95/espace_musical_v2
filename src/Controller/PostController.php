@@ -18,6 +18,9 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
+
+// TODO: Renvoie de texte d'erreur 
+
 /** @Route("/post", methods={"POST"}) */
 class PostController extends AbstractController {
 
@@ -60,12 +63,18 @@ class PostController extends AbstractController {
                 }
 
             } else {
-                return new Response("Vos mots de passes ne sont pas identiques.", Response::HTTP_PRECONDITION_FAILED);
+                $contentToReturn = $myFunctions->returnErrorMessage("Vos mots de passes ne sont pas identiques.");
+                $response = new JsonResponse();
+                $response
+                    ->setContent($contentToReturn)
+                    ->setStatusCode(400, "Une erreur est survenue.")
+                ;
+                return $response;
             }
         } elseif (count($errors) > 0) {
             $response = new JsonResponse();
             $response
-                ->setContent($serializer->serialize($violations, 'json'))
+                ->setContent($serializer->serialize($errors, 'json'))
                 ->setStatusCode(400, "Une erreur est survenue.")
             ;
             return $response;
@@ -86,10 +95,22 @@ class PostController extends AbstractController {
                     $response->setContent($serializer->serialize($user, 'json', ['groups' => 'user']));
                     return $response;
                 } else {
-                    return new Response("Mot de passe incorrect.", Response::HTTP_UNAUTHORIZED);
+                    $contentToReturn = $myFunctions->returnErrorMessage("Mot de passe incorrect.");
+                    $response = new JsonResponse();
+                    $response
+                        ->setContent($contentToReturn)
+                        ->setStatusCode(400, "Une erreur est survenue.")
+                    ;
+                    return $response;
                 }
             } else {
-                return new Response("Adresse email ou pseudo non trouvé.", Response::HTTP_PRECONDITION_FAILED);
+                $contentToReturn = $myFunctions->returnErrorMessage("Adresse email non trouvée.");
+                $response = new JsonResponse();
+                $response
+                    ->setContent($contentToReturn)
+                    ->setStatusCode(400, "Une erreur est survenue.")
+                ;
+                return $response;
             }
         } elseif (count($errors) > 0) {
             $response = new JsonResponse();
@@ -122,7 +143,13 @@ class PostController extends AbstractController {
                 if ($recievedData['price'] != '') $ad->setPrice($recievedData['price']);
                 if (count($recievedData['pictures']) > 0) $ad->setPictures($recievedData['pictures']);
             } else {
-                return new Response("Aucun utilisateur avec cet id présent en base de données.", Response::HTTP_NOT_FOUND);
+                $contentToReturn = $myFunctions->returnErrorMessage("Aucun utilisateur avec cet id présent en base de données.");
+                $response = new JsonResponse();
+                $response
+                    ->setContent($contentToReturn)
+                    ->setStatusCode(400, "Une erreur est survenue.")
+                ;
+                return $response;
             }
 
             $violations = $validator->validate($ad);
@@ -195,7 +222,13 @@ class PostController extends AbstractController {
                     return $response;
                 }
             } else {
-                return new Response("Aucun utilisateur avec cet id présent en base de données.", Response::HTTP_NOT_FOUND);
+                $contentToReturn = $myFunctions->returnErrorMessage("Aucun utilisateur avec cet id présent en base de données.");
+                $response = new JsonResponse();
+                $response
+                    ->setContent($contentToReturn)
+                    ->setStatusCode(400, "Une erreur est survenue.")
+                ;
+                return $response;
             }
         } elseif (count($errors) > 0) {
             $response = new JsonResponse();

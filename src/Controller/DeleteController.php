@@ -31,10 +31,22 @@ class DeleteController extends AbstractController {
                     $manager->flush();
                     return new Response("L'utilisateur a correctement été supprimé de la base de données.", Response::HTTP_FOUND);
                 } else {
-                    return new Response("L'id fourni ne correspond pas avec l'utilisateur ayant ce slug.", Response::HTTP_UNAUTHORIZED);
+                    $contentToReturn = $myFunctions->returnErrorMessage("L'id fourni ne correspond pas avec l'utilisateur ayant ce slug.");
+                    $response = new JsonResponse();
+                    $response
+                        ->setContent($contentToReturn)
+                        ->setStatusCode(400, "Une erreur est survenue.")
+                    ;
+                    return $response;
                 }
             } else {
-                return new Response("L'utilisateur demandé n'a pas été trouvé en base de données.", Response::HTTP_NOT_FOUND);
+                $contentToReturn = $myFunctions->returnErrorMessage("L'utilisateur demandé n'a pas été trouvé en base de données.");
+                $response = new JsonResponse();
+                $response
+                    ->setContent($contentToReturn)
+                    ->setStatusCode(400, "Une erreur est survenue.")
+                ;
+                return $response;
             }
         } elseif (count($errors) > 0) {
             $response = new JsonResponse();
@@ -58,13 +70,31 @@ class DeleteController extends AbstractController {
                         $manager->flush();
                         return new Response("L'annonce a correctement été supprimée de la base de données.", Response::HTTP_FOUND);
                     } else {
-                        return new Response("Seul l'auteur est autorisé à supprimer son annonce.", Response::HTTP_UNAUTHORIZED);
+                        $contentToReturn = $myFunctions->returnErrorMessage("Seul l'auteur d'une annonce est autorisé à supprimer celle-ci.");
+                        $response = new JsonResponse();
+                        $response
+                            ->setContent($contentToReturn)
+                            ->setStatusCode(400, "Une erreur est survenue.")
+                        ;
+                        return $response;
                     }
                 } else {
-                    return new Response("L'id fourni ne correspond pas avec l'annonce ayant ce slug.", Response::HTTP_UNAUTHORIZED);
+                    $contentToReturn = $myFunctions->returnErrorMessage("L'id fourni ne correspond pas avec l'annonce ayant ce slug.");
+                    $response = new JsonResponse();
+                    $response
+                        ->setContent($contentToReturn)
+                        ->setStatusCode(400, "Une erreur est survenue.")
+                    ;
+                    return $response;
                 }
             } else {
-                return new Response("L'annonce demandée n'a pas été trouvée en base de données.", Response::HTTP_NOT_FOUND);
+                $contentToReturn = $myFunctions->returnErrorMessage("L'annonce demandée n'as pas été trouvée en base de données.");
+                $response = new JsonResponse();
+                $response
+                    ->setContent($contentToReturn)
+                    ->setStatusCode(400, "Une erreur est survenue.")
+                ;
+                return $response;
             }
         } elseif (count($errors) > 0) {
             $response = new JsonResponse();
@@ -88,13 +118,31 @@ class DeleteController extends AbstractController {
                         $manager->flush();
                         return new Response("L'évènement a correctement été supprimé de la base de données.", Response::HTTP_FOUND);
                     } else {
-                        return new Response("Seul l'auteur est autorisé à supprimer son évènement.", Response::HTTP_UNAUTHORIZED);
+                        $contentToReturn = $myFunctions->returnErrorMessage("Seul l'auteur d'un évènement est autorisé à supprimer celui-ci.");
+                        $response = new JsonResponse();
+                        $response
+                            ->setContent($contentToReturn)
+                            ->setStatusCode(400, "Une erreur est survenue.")
+                        ;
+                        return $response;
                     }
                 } else {
-                    return new Response("L'id fourni ne correspond pas avec l'évènement ayant ce slug.", Response::HTTP_UNAUTHORIZED);
+                    $contentToReturn = $myFunctions->returnErrorMessage("L'id fourni ne correspond pas avec l'évènement ayant ce slug.");
+                    $response = new JsonResponse();
+                    $response
+                        ->setContent($contentToReturn)
+                        ->setStatusCode(400, "Une erreur est survenue.")
+                    ;
+                    return $response;
                 }
             } else {
-                return new Response("L'évènement demandé n'a pas été trouvé en base de données.", Response::HTTP_NOT_FOUND);
+                $contentToReturn = $myFunctions->returnErrorMessage("L'évènement demandé n'as pas été trouvé en base de données.");
+                $response = new JsonResponse();
+                $response
+                    ->setContent($contentToReturn)
+                    ->setStatusCode(400, "Une erreur est survenue.")
+                ;
+                return $response;
             }
         } elseif (count($errors) > 0) {
             $response = new JsonResponse();

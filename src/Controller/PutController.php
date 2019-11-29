@@ -71,10 +71,22 @@ class PutController extends AbstractController {
                                     $user->setPassword($recievedData['newPassword']);
                                     $passwordHasModified = true;
                                 } else {
-                                    return new Response("Le nouveau mot de passe est identique à l'ancien.", Response::HTTP_PRECONDITION_FAILED);
+                                    $contentToReturn = $myFunctions->returnErrorMessage("Le nouveau mot de passe est identique à l'ancien.");
+                                    $response = new JsonResponse();
+                                    $response
+                                        ->setContent($contentToReturn)
+                                        ->setStatusCode(400, "Une erreur est survenue.")
+                                    ;
+                                    return $response;
                                 }
                             } else {
-                                return new Response("Les champs correspondant au nouveau mot de passe ne correspondent pas.", Response::HTTP_PRECONDITION_FAILED);
+                                $contentToReturn = $myFunctions->returnErrorMessage("Les champs correspondant au nouveau mot de passe ne correspondent pas.");
+                                $response = new JsonResponse();
+                                $response
+                                    ->setContent($contentToReturn)
+                                    ->setStatusCode(400, "Une erreur est survenue.")
+                                ;
+                                return $response;
                             }
                         }
     
@@ -97,13 +109,31 @@ class PutController extends AbstractController {
                             return $response;
                         }
                     } else {
-                        return new Response("Le mot de passe actuel est incorrect.", Response::HTTP_UNAUTHORIZED);
+                        $contentToReturn = $myFunctions->returnErrorMessage("Le mot de passe actuel est incorrect.");
+                        $response = new JsonResponse();
+                        $response
+                            ->setContent($contentToReturn)
+                            ->setStatusCode(400, "Une erreur est survenue.")
+                        ;
+                        return $response;
                     }
                 } else {
-                    return new Response("L'id fourni dans le Json ne correspond pas à celui de l'utilisateur possédant ce slug.", Response::HTTP_UNAUTHORIZED);
+                    $contentToReturn = $myFunctions->returnErrorMessage("L'id fourni dans le Json ne correspond pas à celui de l'utilisateur possédant ce slug.");
+                    $response = new JsonResponse();
+                    $response
+                        ->setContent($contentToReturn)
+                        ->setStatusCode(400, "Une erreur est survenue.")
+                    ;
+                    return $response;
                 }
             } else {
-                return new Response("L'utilisateur demandé n'a pas été trouvé en base de données.", Response::HTTP_NOT_FOUND);
+                $contentToReturn = $myFunctions->returnErrorMessage("L'utilisateur demandé n'a pas été trouvé en base de données.");
+                $response = new JsonResponse();
+                $response
+                    ->setContent($contentToReturn)
+                    ->setStatusCode(400, "Une erreur est survenue.")
+                ;
+                return $response;
             }
         } elseif (count($errors) > 0) {
             $response = new JsonResponse();
@@ -167,10 +197,22 @@ class PutController extends AbstractController {
                         return $response;
                     }
                 } else {
-                    return new Response("Seul l'auteur est autorisé à modifier son annonce.", Response::HTTP_UNAUTHORIZED);
+                    $contentToReturn = $myFunctions->returnErrorMessage("Seul l'auteur est autorisé à modifier son annonce.");
+                    $response = new JsonResponse();
+                    $response
+                        ->setContent($contentToReturn)
+                        ->setStatusCode(400, "Une erreur est survenue.")
+                    ;
+                    return $response;
                 }
             } else {
-                return new Response("L'annonce demandée n'a pas été trouvée en base de données.", Response::HTTP_NOT_FOUND);
+                $contentToReturn = $myFunctions->returnErrorMessage("L'annonce demandée n'a pas été trouvée en base de données.");
+                $response = new JsonResponse();
+                $response
+                    ->setContent($contentToReturn)
+                    ->setStatusCode(400, "Une erreur est survenue.")
+                ;
+                return $response;
             }
         } elseif (count($errors) > 0) {
             $response = new JsonResponse();
@@ -250,10 +292,23 @@ class PutController extends AbstractController {
                         return $response;
                     }
                 } else {
-                    return new Response("Seul l'auteur est autorisé à modifier son évènement.", Response::HTTP_UNAUTHORIZED);
+                    $contentToReturn = $myFunctions->returnErrorMessage("Seul l'auteur est autorisé à modifier son évènement.");
+                    $response = new JsonResponse();
+                    $response
+                        ->setContent($contentToReturn)
+                        ->setStatusCode(400, "Une erreur est survenue.")
+                    ;
+                    return $response;
                 }
             } else {
                 return new Response("L'évènement demandé n'a pas été trouvé en base de données.", Response::HTTP_NOT_FOUND);
+                $contentToReturn = $myFunctions->returnErrorMessage("L'évènement demandé n'a pas été trouvé en base de données.");
+                $response = new JsonResponse();
+                $response
+                    ->setContent($contentToReturn)
+                    ->setStatusCode(400, "Une erreur est survenue.")
+                ;
+                return $response;
             }
         } elseif (count($errors) > 0) {
             $response = new JsonResponse();
