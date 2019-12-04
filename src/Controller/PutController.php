@@ -138,7 +138,7 @@ class PutController extends AbstractController {
         } elseif (count($errors) > 0) {
             $response = new JsonResponse();
             $response
-                ->setContent($serializer->serialize($violations, 'json'))
+                ->setContent($serializer->serialize($errors, 'json'))
                 ->setStatusCode(400, "Une erreur est survenue.")
             ;
             return $response;
@@ -217,7 +217,7 @@ class PutController extends AbstractController {
         } elseif (count($errors) > 0) {
             $response = new JsonResponse();
             $response
-                ->setContent($serializer->serialize($violations, 'json'))
+                ->setContent($serializer->serialize($errors, 'json'))
                 ->setStatusCode(400, "Une erreur est survenue.")
             ;
             return $response;
@@ -313,7 +313,7 @@ class PutController extends AbstractController {
         } elseif (count($errors) > 0) {
             $response = new JsonResponse();
             $response
-                ->setContent($serializer->serialize($violations, 'json'))
+                ->setContent($serializer->serialize($errors, 'json'))
                 ->setStatusCode(400, "Une erreur est survenue.")
             ;
             return $response;
