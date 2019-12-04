@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Utils\MyFunctions;
 use App\Repository\AdRepository;
 use App\Repository\UserRepository;
 use App\Repository\EventRepository;
@@ -21,6 +22,7 @@ class GetController extends AbstractController {
             $response->setContent($serializer->serialize($users, 'json', ['groups' => 'user']));
             return $response;
         } else {
+            $myFunctions = new MyFunctions();
             $contentToReturn = $myFunctions->returnErrorMessage("Aucun utilisateur présent en base de données.");
             $response = new JsonResponse();
             $response
@@ -38,6 +40,7 @@ class GetController extends AbstractController {
             $response->setContent($serializer->serialize($user, 'json', ['groups' => 'user']));
             return $response;
         } else {
+            $myFunctions = new MyFunctions();
             $contentToReturn = $myFunctions->returnErrorMessage("L'utilisateur demandé n'as pas été trouvé en base de données.");
             $response = new JsonResponse();
             $response
@@ -55,6 +58,7 @@ class GetController extends AbstractController {
             $response->setContent($serializer->serialize($ads, 'json', ['groups' => 'ad']));
             return $response;
         } else {
+            $myFunctions = new MyFunctions();
             $contentToReturn = $myFunctions->returnErrorMessage("Aucune annonce présente en base de données.");
             $response = new JsonResponse();
             $response
@@ -72,6 +76,7 @@ class GetController extends AbstractController {
             $response->setContent($serializer->serialize($ad, 'json', ['groups' => 'ad']));
             return $response;
         } else {
+            $myFunctions = new MyFunctions();
             $contentToReturn = $myFunctions->returnErrorMessage("L'annonce demandée n'as pas été trouvée en base de données.");
             $response = new JsonResponse();
             $response
@@ -95,6 +100,7 @@ class GetController extends AbstractController {
             $response->setContent($serializer->serialize($events, 'json', ['groups' => 'event']));
             return $response;
         } else {
+            $myFunctions = new MyFunctions();
             $contentToReturn = $myFunctions->returnErrorMessage("Aucun évènement présent en base de données.");
             $response = new JsonResponse();
             $response
@@ -116,6 +122,7 @@ class GetController extends AbstractController {
             $response->setContent($serializer->serialize($event, 'json', ['groups' => 'event']));
             return $response;
         } else {
+            $myFunctions = new MyFunctions();
             $contentToReturn = $myFunctions->returnErrorMessage("L'évènement demandé n'as pas été trouvé en base de données.");
             $response = new JsonResponse();
             $response
